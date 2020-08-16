@@ -1,6 +1,6 @@
 package com.bonial.transactions.statistics;
 
-import com.bonial.transactions.statistics.dto.StatisticsDTO;
+import com.bonial.transactions.statistics.dto.StatisticsResponseDTO;
 import com.bonial.transactions.statistics.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,7 @@ public class StatisticsController {
 
     @RequestMapping(value = "/statistics", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public StatisticsDTO getStatistics() {
+    public StatisticsResponseDTO getStatistics() {
         return transactionService.getStatistics();
     }
 

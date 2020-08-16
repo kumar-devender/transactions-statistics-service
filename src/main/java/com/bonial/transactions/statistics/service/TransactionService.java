@@ -1,7 +1,7 @@
 package com.bonial.transactions.statistics.service;
 
 import com.bonial.transactions.statistics.cache.StatisticsStore;
-import com.bonial.transactions.statistics.dto.StatisticsDTO;
+import com.bonial.transactions.statistics.dto.StatisticsResponseDTO;
 import com.bonial.transactions.statistics.dto.TransactionDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class TransactionService {
         return true;
     }
 
-    public StatisticsDTO getStatistics() {
+    public StatisticsResponseDTO getStatistics() {
         Instant currentTime = Instant.now();
         return statisticsStore.getStatistics(currentTime);
     }

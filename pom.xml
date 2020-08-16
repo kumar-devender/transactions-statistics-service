@@ -21,6 +21,7 @@
         <slfj-verion>1.7.30</slfj-verion>
         <gmaven-plugin.version>1.4</gmaven-plugin.version>
         <surefire.version>3.0.0-M4</surefire.version>
+        <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <spock-spring-version>2.0-M2-groovy-3.0</spock-spring-version>
         <spock.version>1.3-groovy-2.4</spock.version>
         <gmavenplus-plugin.version>1.6.1</gmavenplus-plugin.version>
@@ -105,6 +106,18 @@
         </dependency>
     </dependencies>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
             <plugin>
@@ -160,6 +173,8 @@
                     <testSourceDirectory>src/test/java</testSourceDirectory>
                     <includes>
                         <include>**/*Spec.java</include>
+                        <include>**/*Spec.groovy</include>
+                        <include>**/*Test.groovy</include>
                         <!-- Yes, .java extension -->
                         <include>**/*Test.java</include>
                         <!-- Just in case having "normal" JUnit tests -->

@@ -1,7 +1,7 @@
 package com.bonial.transactions.statistics.cache;
 
 import com.bonial.transactions.statistics.dto.Statistics;
-import com.bonial.transactions.statistics.dto.StatisticsDTO;
+import com.bonial.transactions.statistics.dto.StatisticsResponseDTO;
 import com.bonial.transactions.statistics.dto.TransactionDTO;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -40,7 +40,8 @@ public class StatisticsStore {
     }
 
     public void store(TransactionDTO transactionDTO) {
-        String key = Instant.ofEpochMilli(transactionDTO.getTimestamp()).atZone(UTC_ZONE_ID).toLocalDateTime().format(DATE_TIME_FORMATTER);
+        String key = Instant.ofEpochMilli(transactionDTO.getTimestamp()).atZone(UTC_ZONE_ID)
+                .toLocalDateTime().format(DATE_TIME_FORMATTER);
         synchronized (key) {
             Statistics statistics = cache.getIfPresent(key);
             if (statistics == null) {
@@ -52,27 +53,33 @@ public class StatisticsStore {
         }
     }
 
-    public StatisticsDTO getStatistics(Instant currentTime) {
+    public StatisticsResponseDTO getStatistics(Instant currentTime) {
         Map<String, Statistics> statistics = cache.asMap().entrySet()
                 .parallelStream()
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-        StatisticsDTO statisticsDTO = new StatisticsDTO();
+        StatisticsResponseDTO statisticsDTO = buildStatisticsResponseDTO(currentTime, statistics);
+        return statisticsDTO;
+    }
+
+    private StatisticsResponseDTO buildStatisticsResponseDTO(Instant currentTime, Map<String, Statistics> statistics) {
+        StatisticsResponseDTO statisticsDTO = new StatisticsResponseDTO();
+        statisticsDTO.setMin(Double.MAX_VALUE);
 
         statistics.entrySet()
                 .stream()
-                .filter(entry -> isActive(currentTime, entry.getKey()))
+                .filter(entry -> isActive(entry.getKey(), currentTime))
                 .forEach(entry -> updateSummary(statisticsDTO, entry.getValue()));
 
         statisticsDTO.setAvg(statisticsDTO.getSum() / statisticsDTO.getCount());
         return statisticsDTO;
     }
 
-    private boolean isActive(Instant currentTime, String storedKey) {
+    private boolean isActive(String storedKey, Instant currentTime) {
         LocalDateTime localDateTime = LocalDateTime.parse(storedKey, DATE_TIME_FORMATTER);
         return localDateTime.isAfter(currentTime.atZone(UTC_ZONE_ID).toLocalDateTime().minusMinutes(1));
     }
 
-    private void updateSummary(StatisticsDTO statisticsDTO, Statistics statistics) {
+    private void updateSummary(StatisticsResponseDTO statisticsDTO, Statistics statistics) {
         double sum = statisticsDTO.getSum() + statistics.getSum();
         double max = statisticsDTO.getMax() > statistics.getMax() ? statisticsDTO.getMax() : statistics.getMax();
         double min = statisticsDTO.getMin() < statistics.getMin() ? statisticsDTO.getMin() : statistics.getMin();

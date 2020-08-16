@@ -13,7 +13,7 @@ import static org.springframework.http.HttpStatus.*
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles(profiles = "integration-test")
-class TransactionControllerIntegrationTest extends IntegrationTestSpecification {
+class TransactionControllerIntegrationSpec extends IntegrationTestSpecification {
     private static final String RESOURCE_BASE_PATH = '/v1/transactions'
 
     def 'create transaction with correct time stamp'() {
@@ -67,8 +67,25 @@ class TransactionControllerIntegrationTest extends IntegrationTestSpecification 
         //@formatter:on
     }
 
+    def 'create transaction with less than one amount'() {
+        //@formatter:off
+        given:
+        Instant instant = Instant.now()
+        def transaction = buildTransactionDTO(instant)
+        transaction.setAmount(new BigDecimal(0.5))
+        when:
+        def response = this.getEndpoint()
+            .headers(buildHeaders())
+            .body(transaction)
+            .post(RESOURCE_BASE_PATH)
+            .prettyPeek()
+        then:
+        response.then()
+            .statusCode(BAD_REQUEST.value())
+        //@formatter:on
+    }
+
     def buildTransactionDTO(Instant instant) {
-        println " request time stamp " + instant.toEpochMilli()
         return TransactionDTO.builder()
                 .amount(new BigDecimal(555.50))
                 .timestamp(instant.toEpochMilli())

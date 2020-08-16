@@ -4,10 +4,10 @@ import lombok.Data;
 
 
 @Data
-public class StatisticsDTO {
+public class StatisticsResponseDTO {
     private double sum;
     private double avg;
     private double max;
-    private double min = Double.MAX_VALUE;
+    private double min;
     private long count;
 }
