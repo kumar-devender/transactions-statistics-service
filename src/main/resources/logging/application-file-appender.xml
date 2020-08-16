@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <appender name="APPLICATION-PLAIN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${loggingPath}/application-plain.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${loggingPath}/application-plain-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>200MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>${cleanup_threshold_in_days}</maxHistory>
+        </rollingPolicy>
+    </appender>
+    <!--
+    https://blog.overops.com/how-to-instantly-improve-your-java-logging-with-7-logback-tweaks/
+    -->
+    <appender name="ASYNC-APPLICATION-PLAIN" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="APPLICATION-PLAIN"/>
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>500</queueSize>
+    </appender>
+</included>

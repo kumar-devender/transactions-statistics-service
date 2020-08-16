@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <springProperty name="loggingPath" source="logging.path" defaultValue="logs/applogs"/>
+    <springProperty name="cleanup_threshold_in_days" source="logging.cleanupInDays" defaultValue="5"/>
+    <if condition='isDefined("spring.profiles.active")'>
+        <then>
+            <include resource="logging/logging-server.xml"/>
+        </then>
+        <else>
+            <include resource="logging/logging-local.xml"/>
+        </else>
+    </if>
+</configuration>
