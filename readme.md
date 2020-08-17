@@ -1,13 +1,14 @@
-### Transaction service
+### Transaction Statistics service
 
 #### Running application
 Clone the project on your system
 
 ````
-git clone https://github.com/kumar-devender/penny-bank.git
+git clone https://github.com/kumar-devender/transactions-statistics-service.git
 ````
-Enter in the cloned repository and run the application
+Navigate in the cloned repository and run the following two commands
 ```
-mvn spring-boot:run
+mvn clean package 
+java -jar target/transactions-statistics-service-1.0.0-SNAPSHOT.jar
 
 ```
