@@ -21,6 +21,10 @@ class StatisticsControllerIntegrationSpec extends IntegrationTestSpecification {
     @Autowired
     private StatisticsStore statisticsStore
 
+    def cleanup() {
+        statisticsStore.invalidateCache()
+    }
+
     def 'get statistics of last minute'() {
         //@formatter:off
         given:

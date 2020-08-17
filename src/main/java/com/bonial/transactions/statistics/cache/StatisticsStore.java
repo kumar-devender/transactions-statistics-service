@@ -39,6 +39,10 @@ public class StatisticsStore {
                 .build(loader);
     }
 
+    public void invalidateCache() {
+        cache.invalidateAll();
+    }
+
     public void store(TransactionDTO transactionDTO) {
         String key = Instant.ofEpochMilli(transactionDTO.getTimestamp()).atZone(UTC_ZONE_ID)
                 .toLocalDateTime().format(DATE_TIME_FORMATTER);
