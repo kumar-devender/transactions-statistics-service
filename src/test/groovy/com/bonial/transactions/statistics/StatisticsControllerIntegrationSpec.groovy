@@ -73,6 +73,24 @@ class StatisticsControllerIntegrationSpec extends IntegrationTestSpecification {
         //@formatter:on
     }
 
+    def 'get statistics should return empty when no transaction exist'() {
+        //@formatter:off
+        when:
+        def response = this.getEndpoint()
+                .headers(buildHeaders())
+                .get(RESOURCE_BASE_PATH)
+                .prettyPeek()
+        then:
+        response.then()
+                .statusCode(OK.value())
+                .body('sum', equalTo(0.0f))
+                .body('avg', equalTo(0.0f))
+                .body('max', equalTo(0.0f))
+                .body('min', equalTo(0.0f))
+                .body('count', equalTo(0))
+        //@formatter:on
+    }
+
     private void storeTransaction() {
         (1..20).each {
             def transaction = buildTransaction(it)

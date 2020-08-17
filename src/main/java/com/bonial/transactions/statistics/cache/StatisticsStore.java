@@ -14,8 +14,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -61,15 +63,27 @@ public class StatisticsStore {
         Map<String, Statistics> statistics = cache.asMap().entrySet()
                 .parallelStream()
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-        StatisticsResponseDTO statisticsDTO = buildStatisticsResponseDTO(currentTime, statistics);
+        Set<Map.Entry<String, Statistics>> activeTransactionStatistics = getActiveStatistic(statistics, currentTime);
+        StatisticsResponseDTO statisticsDTO = buildStatisticsResponseDTO(currentTime, activeTransactionStatistics);
         return statisticsDTO;
     }
 
-    private StatisticsResponseDTO buildStatisticsResponseDTO(Instant currentTime, Map<String, Statistics> statistics) {
+    private Set<Map.Entry<String, Statistics>> getActiveStatistic(Map<String, Statistics> statistics, Instant currentTime) {
+        return statistics.entrySet()
+                .stream()
+                .filter(entry -> isActive(entry.getKey(), currentTime))
+                .collect(Collectors.toSet());
+    }
+
+    private StatisticsResponseDTO buildStatisticsResponseDTO(Instant currentTime, Set<Map.Entry<String, Statistics>> statistics) {
         StatisticsResponseDTO statisticsDTO = new StatisticsResponseDTO();
+        if (statistics.isEmpty()) {
+            return statisticsDTO;
+        }
+
         statisticsDTO.setMin(Double.MAX_VALUE);
 
-        statistics.entrySet()
+        statistics
                 .stream()
                 .filter(entry -> isActive(entry.getKey(), currentTime))
                 .forEach(entry -> updateSummary(statisticsDTO, entry.getValue()));
